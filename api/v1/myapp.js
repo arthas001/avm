@@ -1,4 +1,5 @@
 var _ = require('lodash');
+var co = require('co');
 var Models = require('../../models');
 var App = Models.App;
 
@@ -55,21 +56,60 @@ var checkUpdate = function(req, res, next){
             message: err.message
         });
     });
-
-
-
-    // App.findAndCountAll().then(function(result){
-    //     res.status(200).json({
-    //         message: "测试",
-    //         result: result,
-    //         key: key,
-    //         body: body,
-    //         userAgent: userAgent
-    //     });
-    // }).catch(function(result){
-    //     res.status(500).json(result);
-    // });
-    
 };
 
 exports.checkUpdate = checkUpdate;
+
+
+/**
+ * 获取符合条件的应用列表
+ * @param {*} req 
+ * @param {*} res 
+ */
+var applist = function(req, res){
+    var option = {
+        where: {
+            'status': 1
+        },
+        attributes: ['id', 'appName', 'platform', 'versionName', 'versionCode', 'downloadURL', 'updateInfo', 'isOpen', 'key', 'created_at', 'updated_at']
+    };
+    var page = 0;
+    // option.sortby = 'created_at';
+    // option.order = 'created_at desc';
+
+    if (!_.isEmpty(req.query)) {
+        // 分页
+        if (_.hasIn(req.query, 'page') && _.hasIn(req.query, 'per_page')) {
+            page = _.toInteger(req.query.page);
+            var per_page = _.toInteger(req.query.per_page);
+            option.offset = page;
+            option.limit = per_page;
+        }
+
+        //返回指定记录的数量
+        if (_.hasIn(req.query, 'limit')) {
+            var limit = _.toInteger(req.query.limit);
+            option.limit = limit;
+        }
+
+        if (_.hasIn(req.query, 'sortby') && _.hasIn(req.query, 'order')) {
+            var sortby = req.query.sortby;
+            var order = req.query.order;
+            option.order = sortby + " " + order;
+        }
+    }
+
+
+    co(function *(){
+        var result = yield App.findAndCountAll(option);
+        res.status(200).json(result);
+    }).catch(function(err){
+        res.status(500).json({
+            err: err,
+            message: err.message
+        });
+    });
+    
+}
+
+exports.applist = applist;
