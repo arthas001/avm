@@ -2,6 +2,7 @@ var _ = require('lodash');
 var co = require('co');
 var Models = require('../../models');
 var Utils = require('../../common/Utils');
+var validator = require('validator');
 var App = Models.App;
 
 /**
@@ -138,6 +139,93 @@ var deleteAppByID = function(req, res){
 }
 
 exports.deleteAppByID = deleteAppByID;
+
+
+/**
+ * 更新 app
+ * @param {*} req 
+ * @param {*} res 
+ */
+var updateAppByID = function(req, res){
+    if (!_.hasIn(req.params, 'ID')) {
+        res.status(400).json({
+            message: "Bad Request(请求错误)"
+        });
+        return;
+    }
+
+    if(_.isEmpty(req.body)){
+        res.status(400).json({
+            message: "Bad Request(请求错误)"
+        });
+
+        return;
+    }
+
+    var appInfo = {};
+
+    if (_.hasIn(req.body, 'appName')) {
+        var appName = validator.trim(req.body.appName);
+        appInfo.appName = appName;
+    }
+    
+    if (_.hasIn(req.body, 'platform')) {
+        var platform = _.toInteger(req.body.platform);
+        appInfo.platform = platform;
+    }
+
+    if (_.hasIn(req.body, 'versionName')) {
+        var versionName = validator.trim(req.body.versionName);
+        appInfo.versionName = versionName;
+    }
+    
+    if (_.hasIn(req.body, 'versionCode')) {
+        var versionCode = _.toInteger(req.body.versionCode);
+        appInfo.versionCode = versionCode;
+    }
+
+    if (_.hasIn(req.body, 'downloadURL')) {
+        var downloadURL = validator.trim(req.body.downloadURL);
+        appInfo.downloadURL = downloadURL;
+    }
+    
+    if (_.hasIn(req.body, 'updateInfo')) {
+        var updateInfo = validator.trim(req.body.updateInfo);
+        appInfo.updateInfo = updateInfo;
+    }
+    if (_.hasIn(req.body, 'isOpen')) {
+        var isOpen = _.toInteger(req.body.isOpen);
+        appInfo.isOpen = isOpen;
+    }
+    console.log(appInfo);
+    var ID = req.params.ID;
+    var option = {
+        where: {'id': ID}
+    };
+    co(function *(){
+        var _app = yield App.findOne(option);
+        if (!_.isEmpty(_app)) {
+            _app = _.merge(_app, appInfo);
+            var result = yield _app.save();
+            result = _.pick(result, ['appName', 'platform', 'versionName', 'versionCode']);
+            res.status(200).json(result);
+        }else {
+            res.status(404).json({
+                message: "Not Found(未找到资源)"
+            });
+        }
+    }).catch(function(err){
+        res.status(500).json({
+            err: err,
+            message: err.message
+        });
+    });
+
+
+
+
+}
+exports.updateAppByID = updateAppByID;
 
 
 /**

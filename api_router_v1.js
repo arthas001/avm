@@ -23,6 +23,11 @@ router.delete('/myapp/:ID', myapp_controller.deleteAppByID);
 
 
 /**
+ * 更改 app
+ */
+router.put('/myapp/:ID', myapp_controller.updateAppByID);
+
+/**
  * 获取应用列表
  */
 router.get('/myapp', myapp_controller.applist);
