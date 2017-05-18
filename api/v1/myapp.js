@@ -1,6 +1,7 @@
 var _ = require('lodash');
 var co = require('co');
 var Models = require('../../models');
+var Utils = require('../../common/Utils');
 var App = Models.App;
 
 /**
@@ -59,6 +60,43 @@ var checkUpdate = function(req, res, next){
 };
 
 exports.checkUpdate = checkUpdate;
+
+
+/**
+ * 创建 App
+ * @param {*} req 
+ * @param {*} res 
+ */
+var createApp = function(req, res){
+    if (_.isEmpty(req.body)) {
+        res.status(400).json({
+            message: "Bad Request(请求错误)"
+        });
+        return;
+    }
+
+    var body = req.body;
+    var uuid = Utils.getUUID();
+    var appInfo = {
+        id: uuid,
+        status: 1,
+        key: Utils.masterKey(uuid)
+    };
+
+    _.merge(appInfo, body);
+    
+    co(function *(){
+        var result = yield App.create(appInfo);
+        res.status(200).json(appInfo);
+    }).catch(function(err){
+        res.status(500).json({
+            err: err,
+            message: err.message
+        });
+    });
+}
+
+exports.createApp = createApp;
 
 
 /**
