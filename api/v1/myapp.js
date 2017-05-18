@@ -98,6 +98,47 @@ var createApp = function(req, res){
 
 exports.createApp = createApp;
 
+/**
+ * 删除app - 软删除
+ * @param {*} req 
+ * @param {*} res 
+ */
+var deleteAppByID = function(req, res){
+    if (!_.hasIn(req.params, 'ID')) {
+        res.status(400).json({
+            message: "Bad Request(请求错误)"
+        });
+
+        return;
+    }
+
+    var ID = req.params.ID;
+    var option = {
+        where: {'id': ID}
+    };
+
+    co(function *(){
+        var _app = yield App.findOne(option);
+        if (_.isEmpty(_app)) {
+            res.status(404).json({
+                message: "Not Found(未找到资源)"
+            });
+        }else {
+            _app.status = 0;
+            var result = yield _app.save();
+            result = _.pick(result, ['appName', 'platform', 'versionName', 'versionCode']);
+            res.status(200).json(result);
+        }
+    }).catch(function(err){
+        res.status(500).json({
+            err: err,
+            message: err.message
+        });
+    });
+}
+
+exports.deleteAppByID = deleteAppByID;
+
 
 /**
  * 获取符合条件的应用列表
@@ -109,11 +150,11 @@ var applist = function(req, res){
         where: {
             'status': 1
         },
-        attributes: ['id', 'appName', 'platform', 'versionName', 'versionCode', 'downloadURL', 'updateInfo', 'isOpen', 'key', 'created_at', 'updated_at']
+        attributes: ['id', 'appName', 'platform', 'versionName', 'versionCode', 'downloadURL', 'updateInfo', 'isOpen']
     };
     var page = 0;
-    // option.sortby = 'created_at';
-    // option.order = 'created_at desc';
+    option.sortby = 'created_at';
+    option.order = 'created_at desc';
 
     if (!_.isEmpty(req.query)) {
         // 分页
@@ -140,6 +181,7 @@ var applist = function(req, res){
 
     co(function *(){
         var result = yield App.findAndCountAll(option);
+        result.page = page;
         res.status(200).json(result);
     }).catch(function(err){
         res.status(500).json({

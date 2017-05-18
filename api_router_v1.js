@@ -17,6 +17,12 @@ router.post('/myapp', myapp_controller.createApp);
 
 
 /**
+ * 根据 ID  删除 app (软删除)
+ */
+router.delete('/myapp/:ID', myapp_controller.deleteAppByID);
+
+
+/**
  * 获取应用列表
  */
 router.get('/myapp', myapp_controller.applist);
