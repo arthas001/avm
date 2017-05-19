@@ -1,9 +1,10 @@
 var Sequelize = require('sequelize');
+var config = require('../config');
 
-var sequelize = new Sequelize('avm', 'root', '1234567890', {
-    'dialect': 'mysql',
-    'host': 'localhost',
-    'port': 3306,
+var sequelize = new Sequelize(config.db.db_name, config.db.username, config.db.password, {
+    'dialect': config.db.dialect,
+    'host': config.db.host,
+    'port': config.db.port,
     'define': {
         'underscored': true
     }

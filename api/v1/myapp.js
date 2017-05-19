@@ -234,7 +234,6 @@ exports.updateAppByID = updateAppByID;
  * @param {*} res 
  */
 var applist = function(req, res){
-    console.log(req.decoded);
     var option = {
         where: {
             'status': 1
