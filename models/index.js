@@ -11,7 +11,11 @@ var sequelize = new Sequelize('avm', 'root', '1234567890', {
 
 exports.sequelize = sequelize;
 
-// 导出应用
+// 应用
 var App = require('./myapp')(sequelize);
-
 exports.App = App;
+
+
+// 用户
+var User = require('./user')(sequelize);
+exports.User = User;
