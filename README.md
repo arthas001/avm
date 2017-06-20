@@ -31,13 +31,13 @@ var config = {
 ## 运行项目：
 
 ```
-1. git clone https://git.oschina.net/sealand/avm.git
+1. git clone https://github.com/arthas001/avm.git
 2. cd appversionmanager
 3. npm start
 ```
 
 ## 测试效果
-![dfadfa](http://git.oschina.net/sealand/avm/raw/master/WX20170619-145304@2x.png)
+![测试效果](https://github.com/arthas001/avm/blob/master/WX20170619-145304%402x.png)
 
 更多接口请查看项目源码。
 
